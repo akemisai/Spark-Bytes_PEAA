@@ -36,7 +36,7 @@ export default function MyEventsPage() {
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .eq('created_by', session.user.email) // Filter by the logged-in user's email
+        .eq('created_by', session.user.email)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -50,6 +50,24 @@ export default function MyEventsPage() {
     fetchMyEvents();
   }, [session]);
 
+  // 🔴 This function handles deleting an event by its ID
+  const handleDelete = async (id: string) => {
+    // Show a browser confirmation prompt before deleting
+    const confirm = window.confirm('Are you sure you want to delete this event?');
+    if (!confirm) return;
+
+    // Call Supabase to delete the event from the 'events' table
+    const { error } = await supabase.from('events').delete().eq('id', id);
+
+    if (error) {
+      // If there's an error, log it to the console
+      console.error('Error deleting event:', error.message);
+    } else {
+      // If deletion is successful, update local state to remove the event from the UI
+      setEvents(prev => prev.filter(event => event.id !== id));
+    }
+  };
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -57,8 +75,7 @@ export default function MyEventsPage() {
   return (
     <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
       <h1>My Events</h1>
-      
-      {/* Add Event Button - always shown when session exists */}
+
       {session && (
         <button
           onClick={() => router.push('/addEvent')}
@@ -75,6 +92,7 @@ export default function MyEventsPage() {
           Add Event
         </button>
       )}
+
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {events.map(event => (
           <li key={event.id} style={{ borderBottom: '1px solid #ddd', padding: '1rem 0' }}>
@@ -84,20 +102,37 @@ export default function MyEventsPage() {
             <p><strong>Status:</strong> {event.status}</p>
             <p><strong>Created At:</strong> {new Date(event.created_at).toLocaleString()}</p>
 
-            <button //edit event button
-              onClick={() => router.push(`/editEvent/${event.id}`)}
-              style={{
-                marginTop: '0.5rem',
-                backgroundColor: '#c00',
-                color: 'white',
-                padding: '0.4rem 1rem',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
-            >
-             Edit Event
-          </button>
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+              {/* ✏️ Button to navigate to the edit page */}
+              <button
+                onClick={() => router.push(`/editEvent/${event.id}`)}
+                style={{
+                  backgroundColor: '#c00',
+                  color: 'white',
+                  padding: '0.4rem 1rem',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                Edit Event
+              </button>
+
+              {/* Button to delete this event, when clicked triggers handleDelete function */}
+              <button
+                onClick={() => handleDelete(event.id)}
+                style={{
+                  backgroundColor: '#c00',
+                  color: 'white',
+                  padding: '0.4rem 1rem',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                Delete Event
+              </button>
+            </div>
           </li>
         ))}
       </ul>
