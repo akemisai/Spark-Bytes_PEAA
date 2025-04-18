@@ -50,7 +50,7 @@ export default function MyEventsPage() {
     fetchMyEvents();
   }, [session]);
 
-  // 🔴 This function handles deleting an event by its ID
+  // This function handles deleting an event by its ID
   const handleDelete = async (id: string) => {
     // Show a browser confirmation prompt before deleting
     const confirm = window.confirm('Are you sure you want to delete this event?');
@@ -103,7 +103,7 @@ export default function MyEventsPage() {
             <p><strong>Created At:</strong> {new Date(event.created_at).toLocaleString()}</p>
 
             <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-              {/* ✏️ Button to navigate to the edit page */}
+              {/* Button to navigate to the edit page */}
               <button
                 onClick={() => router.push(`/editEvent/${event.id}`)}
                 style={{
