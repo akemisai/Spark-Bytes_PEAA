@@ -45,7 +45,7 @@ const Navbar = () => {
                     .from('users')
                     .select('dietary_preferences, role')
                     .eq('email', session.user.email)
-                    .single();
+                    .maybeSingle();
 
                 if (error) {
                     console.error("Failed to fetch dietary preferences:", error.message);
